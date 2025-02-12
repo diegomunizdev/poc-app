@@ -1,6 +1,6 @@
 BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
 
-if [ "$BRANCH_NAME" = "develop" ]; then
+if [ "$BRANCH_NAME" != "main" ] && [ "$BRANCH_NAME" != "homolog" ]; then
     # Só executa o pre-commit se a branch for develop
     yarn lint:check &
     yarn prettier:check &
