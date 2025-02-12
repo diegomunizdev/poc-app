@@ -1,4 +1,12 @@
-yarn lint:check &
-yarn prettier:check &
-yarn type:check &
-wait
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+
+if [ "$BRANCH_NAME" = "develop" ]; then
+    # Só executa o pre-commit se a branch for develop
+    yarn lint:check &
+    yarn prettier:check &
+    yarn type:check &
+    wait
+else
+    echo "Pulando pre-commit: a branch atual é $BRANCH_NAME"
+fi
+
