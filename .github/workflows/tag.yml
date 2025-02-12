@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - homolog
     types:
       - closed
 
@@ -12,10 +13,10 @@ permissions:
 
 jobs:
   release:
-    if: github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'homolog' && github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout do código
+      - name: Checkout do código
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -55,7 +56,14 @@ jobs:
           fi
 
       - name: Atualizar versão com Standard Version
-        run: npx standard-version --release-as ${{ env.release_type }}
+        run: |
+          if [[ "${GITHUB_REF##*/}" == "main" ]]; then
+             # On main branch, do a normal release
+             npx standard-version --release-as ${{ env.release_type }}
+           elif [[ "${GITHUB_REF##*/}" == "homolog" ]]; then
+             # On homolog branch, do a prerelease beta
+             npx standard-version --prerelease beta --no-changelog
+           fi
 
       - name: Commit e push das alterações
         run: |
