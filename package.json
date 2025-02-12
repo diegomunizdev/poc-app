@@ -13,8 +13,7 @@
     "type:check": "tsc --noEmit --incremental --skipLibCheck",
     "test": "jest",
     "prepare": "husky",
-    "reset": "rm -rf .next node_modules yarn.lock && yarn",
-    "sonar": "npx sonar-scanner"
+    "reset": "rm -rf .next node_modules yarn.lock && yarn"
   },
   "dependencies": {
     "next": "15.1.7",
