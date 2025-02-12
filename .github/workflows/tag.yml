@@ -65,7 +65,7 @@ jobs:
              npx standard-version --prerelease beta --no-changelog
            fi
 
-      - name: Commit e push das alterações
+      - name: Commit e push
         run: |
           git push --follow-tags origin main
         env:
