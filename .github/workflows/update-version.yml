@@ -1,0 +1,62 @@
+name: 🚀 Atualizar versão com base no título da Pull Request
+
+on:
+  pull_request:
+    types:
+      - closed # Executa quando a PR é "merged"
+
+permissions:
+  contents: write # Permissão para ler e escrever no repositório
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Baixa todo o histórico do repositório
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+
+      - name: 🚀 Instalar dependências
+        run: yarn
+
+      - name: 📌 Commit e Push das alterações
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 📝 Verificar título da Pull Request
+        id: pr_title
+        run: echo "pr_title=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
+
+      - name: 🔍 Definir tipo de versão com base na PR
+        id: version_bump
+        run: |
+          PR_TITLE="${{ env.pr_title }}"
+          echo "Título da Pull Request: $PR_TITLE"
+
+          if [[ "$PR_TITLE" =~ ^feat ]]; then
+            echo "release_type=minor" >> $GITHUB_ENV
+          elif [[ "$PR_TITLE" =~ ^fix ]]; then
+            echo "release_type=patch" >> $GITHUB_ENV
+          elif [[ "$PR_TITLE" =~ ^(BREAKING CHANGE|breaking change) ]]; then
+            echo "release_type=major" >> $GITHUB_ENV
+          else
+            echo "Nenhuma mudança significativa detectada. Saindo..."
+            exit 0
+          fi
+
+      - name: 🔖 Atualizar versão com Standard Version
+        run: npx standard-version --release-as ${{ env.release_type }}
+
+      - name: Commit e push das alterações
+        run: |
+          git push --follow-tags origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

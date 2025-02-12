@@ -1,0 +1,4 @@
+yarn lint:check &
+yarn prettier:check &
+yarn type:check &
+wait
