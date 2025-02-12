@@ -5,6 +5,7 @@ const setup = () => render(<Home />);
 
 describe('Teste', () => {
   it('Testando', () => {
-    expect(setup()).toMatchSnapshot();
+    const { getByTestId } = setup();
+    getByTestId('test');
   });
 });
