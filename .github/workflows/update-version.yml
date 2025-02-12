@@ -2,40 +2,42 @@ name: 🚀 Atualizar versão com base no título da Pull Request
 
 on:
   pull_request:
+    branches:
+      - main
     types:
-      - closed # Executa quando a PR é "merged"
+      - closed
 
 permissions:
-  contents: write # Permissão para ler e escrever no repositório
+  contents: write
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'homolog' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout do código
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Baixa todo o histórico do repositório
+          fetch-depth: 0
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
-      - name: 🚀 Instalar dependências
+      - name: Instalar dependências
         run: yarn
 
-      - name: 📌 Commit e Push das alterações
+      - name: Commit e Push das alterações
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: 📝 Verificar título da Pull Request
+      - name: Verificar título da Pull Request
         id: pr_title
         run: echo "pr_title=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
 
-      - name: 🔍 Definir tipo de versão com base na PR
+      - name: Definir tipo de versão com base na PR
         id: version_bump
         run: |
           PR_TITLE="${{ env.pr_title }}"
@@ -52,7 +54,7 @@ jobs:
             exit 0
           fi
 
-      - name: 🔖 Atualizar versão com Standard Version
+      - name: Atualizar versão com Standard Version
         run: npx standard-version --release-as ${{ env.release_type }}
 
       - name: Commit e push das alterações
