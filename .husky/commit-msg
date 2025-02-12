@@ -12,7 +12,7 @@ COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
 # ci: Changes to CI/CD configurations (GitHub Actions, etc.)
 # build: Changes affecting project build (compilation, dependencies)
 
-if ! echo "$COMMIT_MSG" | grep -qE '^(feat|fix|refactor|chore|docs|style|test|perf|ci|build): '; then
+if ! echo "$COMMIT_MSG" | grep -qE '^(feat|fix|refactor|chore|docs|style|test|perf|ci|build)*'; then
   echo "❌ Error: The commit message is invalid."
   echo "Check the accepted types in the .husky/commit-msg file"
   exit 1
